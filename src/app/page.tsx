@@ -30,10 +30,12 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="hidden md:flex">
-              Log In
+            <Button variant="outline" className="hidden md:flex" asChild>
+              <Link href="/login">Log In</Link>
             </Button>
-            <Button className="bg-teal-600 hover:bg-teal-700">Sign Up</Button>
+            <Button className="bg-teal-600 hover:bg-teal-700" asChild>
+              <Link href="/signup">Sign Up</Link>
+            </Button>
           </div>
         </div>
       </header>
@@ -49,8 +51,8 @@ export default function Home() {
                 Secure, reliable, and easy-to-use banking services to help you manage your finances with confidence.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50">
-                  Open an Account
+                <Button size="lg" className="bg-white text-teal-700 hover:bg-teal-50" asChild>
+                  <Link href="/signup">Open an Account</Link>
                 </Button>
                 <Button
                   size="lg"
@@ -63,7 +65,7 @@ export default function Home() {
             </div>
             <div className="hidden md:block">
               <img
-                src="/placeholder.svg?height=400&width=500"
+                src="assets/placeholder.svg?height=400&width=500"
                 alt="Banking app interface"
                 className="rounded-lg shadow-xl"
               />
@@ -131,9 +133,11 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 md:justify-end">
-                  <Button size="lg" className="bg-teal-600 hover:bg-teal-700">
-                    Open an Account
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button size="lg" className="bg-teal-600 hover:bg-teal-700" asChild>
+                    <Link href="/signup">
+                      Open an Account
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                   <Button size="lg" variant="outline">
                     Contact Us
@@ -149,7 +153,7 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
               <img
-                src="/placeholder.svg?height=500&width=400"
+                src="assets/placeholder.svg?height=500&width=400"
                 alt="Mobile banking app"
                 className="mx-auto rounded-lg shadow-xl"
               />
