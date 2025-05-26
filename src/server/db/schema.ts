@@ -8,7 +8,7 @@ export const createTable = singlestoreTableCreator(
   (name) => `vaulta_${name}`
 )
 
-export const account = createTable(
+export const accounts = createTable(
   "accounts", {
     id: bigint({ mode: "bigint", unsigned: true }).primaryKey(),
     userId: bigint({ mode: "bigint", unsigned: true }).notNull(),
@@ -29,7 +29,7 @@ export const users = createTable(
   }
 );
 
-export const transaction = createTable(
+export const transactions = createTable(
   "transactions", {
     id: bigint({ mode: "bigint", unsigned: true }).primaryKey(),
     accountId: bigint({ mode: "bigint", unsigned: true }).notNull(),
@@ -40,7 +40,7 @@ export const transaction = createTable(
   },
 );
 
-export const session = createTable(
+export const sessions = createTable(
   "sessions", {
     userId: bigint({ mode: "bigint", unsigned: true }).notNull(),
     token: varchar("token", { length: 255 }).notNull(),

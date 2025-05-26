@@ -1,36 +1,29 @@
 import { redirect } from "next/navigation"
+
 import { CreditCard, ArrowUpRight, ArrowDownLeft, Plus, Send, Receipt, PiggyBank, TrendingUp } from "lucide-react"
+
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { DashboardHeader } from "~/components/dashboard-header"
-import { cookies } from "next/headers"
 
-// Mock function to check if user is authenticated
-// In a real app, this would check session/JWT token
-async function isAuthenticated() {
-  // For demo purposes, always return true
-  // In production, implement proper session checking
-  const session = (await cookies()).get("session")
+import { checkAuthenticated } from "../actions/auth"
+import { getUser } from "../actions/data"
 
-  if (!session) {
-    return false
+export default async function DashboardPage() {
+
+  const isAuthenticated = await checkAuthenticated()
+
+  if (!isAuthenticated) {
+    redirect("/login")
   }
 
-  return true
-}
+  const userArray = await getUser()
 
-export default function DashboardPage() {
-  isAuthenticated().then((isAuthenticated) => {
-    if (!isAuthenticated) {
-      redirect("/login")
-    }
-  })
-
-  // Mock user data
-  const user = {
-    name: "John Doe",
-    email: "john.doe@email.com",
+  if (!userArray || userArray.length === 0) {
+    redirect("/login")
   }
+
+  const user = userArray[0]!
 
   // Mock account data
   const accounts = [
@@ -107,7 +100,7 @@ export default function DashboardPage() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.email}!</h1>
           <p className="text-gray-600 mt-2">Here&apos;s what&apos;s happening with your accounts today.</p>
         </div>
 

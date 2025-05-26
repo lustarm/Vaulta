@@ -9,7 +9,7 @@ import crypto from "crypto"
 import { eq } from "drizzle-orm"
 
 import { db } from "~/server/db"
-import { session, users } from "~/server/db/schema"
+import { sessions, users } from "~/server/db/schema"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
@@ -101,7 +101,7 @@ export async function signup(formData: FormData) {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   })
 
-  await db.insert(session).values({
+  await db.insert(sessions).values({
     userId: userid,
     token: sessionid,
     maxAge: BigInt(60 * 60 * 24 * 30), // 30 days
@@ -119,7 +119,17 @@ export async function logout() {
     throw new Error("No session found")
   }
 
-  await db.delete(session).where(eq(session.token, sessionid));
+  await db.delete(sessions).where(eq(sessions.token, sessionid));
 
   redirect("/")
+}
+
+export async function checkAuthenticated() {
+  const sessionid = (await cookies()).get("session")?.value;
+
+  if (!sessionid) {
+    return false 
+  }
+
+  return true
 }
