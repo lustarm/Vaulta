@@ -20,36 +20,34 @@ export async function login(prevState: { error: string | null }, formData: FormD
     return { error: "Email and password are required" }
   }
 
-  if(!remember) {
-    return { error: "Remember me is required" }
-  }
+  const userArray = await db.select().from(users).where(eq(users.email, email))
 
-  // TODO: Implement actual login logic
-  /*
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  })
-
-  if (!user) {
+  if (userArray.length === 0) {
     return { error: "User not found" }
   }
 
-  if (user.password !== password) {
+  const user = userArray[0]!
+
+  const isPasswordValid = await bcrypt.compare(password, user.password)
+
+  if (!isPasswordValid) {
     return { error: "Invalid password" }
   }
 
-  const session = crypto.randomUUID()
+  const session = crypto.randomUUID() as string
 
   (await cookies()).set("session", session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    path: "/",
+    maxAge: remember === "on" ? 60 * 60 * 24 * 30 : 60 * 60 * 24, // 30 days or 1 day
   })
 
-  */
+  await db.insert(sessions).values({
+    userId: user.id,
+    token: session,
+    maxAge: remember === "on" ? BigInt(60 * 60 * 24 * 30) : BigInt(60 * 60 * 24), // 30 days or 1 day
+  })
 
-  // Redirect to dashboard after successful login
   redirect("/dashboard")
 }
 
@@ -89,7 +87,7 @@ export async function signup(prevState: { error: string | null }, formData: Form
     return { error: "Failed to create user" }
   }
 
-  const sessionid = crypto.randomUUID();
+  const sessionid = crypto.randomUUID() as string
 
   (await cookies()).set("session", sessionid, {
     httpOnly: true,
@@ -124,14 +122,14 @@ export async function checkAuthenticated() {
   const sessionid = (await cookies()).get("session")?.value;
 
   if (!sessionid) {
-    return { error: "No session found" }
+    return false
   }
 
   const session = await db.select().from(sessions).where(eq(sessions.token, sessionid))
 
   if (session.length === 0) {
-    return { error: "No session found" }
+    return false
   }
 
-  return { error: null }
+  return true
 }

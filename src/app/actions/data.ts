@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 import { db } from "~/server/db";
-import { users, accounts } from "~/server/db/schema";
+import { users, accounts, sessions } from "~/server/db/schema";
 
 export async function getUser() {
     const sessionid = (await cookies()).get("session")?.value;
@@ -14,15 +14,33 @@ export async function getUser() {
         return null
     }
 
-    return await db.select().from(users).where(eq(users.email, sessionid))
-}
+    const session = await db.select().from(sessions).where(eq(sessions.token, sessionid));
 
-export async function getAccounts() {
-    const users = await getUser()
-
-    if (!users || users.length === 0) {
+    if (session.length === 0) {
         return null
     }
 
-    return await db.select().from(accounts).where(eq(accounts.userId, users[0]!.id))
+    const user = await db.select().from(users).where(eq(users.id, session[0]!.userId))
+
+    if (user.length === 0) {
+        return null
+    }
+
+    return user[0]!
+}
+
+export async function getAccounts() {
+    const user = await getUser()
+
+    if (!user) {
+        return null
+    }
+
+    const accountsArray = await db.select().from(accounts).where(eq(accounts.userId, user.id))
+
+    if (accountsArray.length === 0) {
+        return null
+    }
+
+    return accountsArray
 }

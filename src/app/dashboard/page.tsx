@@ -17,13 +17,11 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  const userArray = await getUser()
+  const user = await getUser()
 
-  if (!userArray || userArray.length === 0) {
+  if (!user) {
     redirect("/login")
   }
-
-  const user = userArray[0]!
 
   // Mock account data
   const accounts = [
