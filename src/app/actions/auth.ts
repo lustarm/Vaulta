@@ -20,8 +20,8 @@ export async function login(formData: FormData) {
   // 3. Set secure cookies
   // 4. Handle errors appropriately
 
-  // For demo purposes, redirect to a dashboard (you can create this later)
-  redirect("/")
+  // Redirect to dashboard after successful login
+  redirect("/dashboard")
 }
 
 export async function signup(formData: FormData) {
@@ -56,4 +56,17 @@ export async function signup(formData: FormData) {
 
   // For demo purposes, redirect to login page
   redirect("/login")
+}
+
+export async function logout() {
+  // TODO: Implement actual logout logic
+  // In a real app, you would:
+  // 1. Clear session/JWT token
+  // 2. Clear cookies
+  // 3. Invalidate session in database
+
+  console.log("User logged out")
+
+  // Redirect to home page
+  redirect("/")
 }
