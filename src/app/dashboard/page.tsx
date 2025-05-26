@@ -99,7 +99,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
-          <p className="text-gray-600 mt-2">Here's what's happening with your accounts today.</p>
+          <p className="text-gray-600 mt-2">Here&apos;s what&apos;s happening with your accounts today.</p>
         </div>
 
         {/* Account Overview */}
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                   <div className="p-3 bg-teal-50 rounded-lg">
                     <h4 className="font-medium text-teal-900 mb-1">Save More This Month</h4>
                     <p className="text-sm text-teal-700">
-                      You're spending 15% less on dining out compared to last month. Keep it up!
+                      You&lsquo;re spending 15% less on dining out compared to last month. Keep it up!
                     </p>
                   </div>
                   <Button variant="outline" size="sm" className="w-full">
