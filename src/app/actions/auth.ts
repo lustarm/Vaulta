@@ -2,21 +2,32 @@
 
 import { redirect } from "next/navigation"
 import { eq } from "drizzle-orm"
-import { db } from "~/server/db"
-import { users } from "~/server/db/schema"
 import { cookies } from "next/headers"
+
 import bcrypt from "bcryptjs"
+import crypto from "crypto"
+
+import { db } from "~/server/db"
+import { session, users } from "~/server/db/schema"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const remember = formData.get("remember") as string
 
+  if (!email || !password) {
+    throw new Error("Email and password are required")
+  }
+
+  if(!remember) {
+    throw new Error("Remember me is required")
+  }
+
+  // TODO: Implement actual login logic
+  /*
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
   })
-
-  console.log("Login attempt:", { email, password, remember })
 
   if (!user) {
     throw new Error("User not found")
@@ -26,14 +37,16 @@ export async function login(formData: FormData) {
     throw new Error("Invalid password")
   }
 
-  const session = crypto.randomUUID()  // TODO: Store session in database
+  const session = crypto.randomUUID()
 
-  ;(await cookies()).set("session", session, {
+  (await cookies()).set("session", session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     path: "/",
   })
+
+  */
 
   // Redirect to dashboard after successful login
   redirect("/dashboard")
@@ -57,29 +70,38 @@ export async function signup(formData: FormData) {
     throw new Error("You must agree to the terms and conditions")
   }
 
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  })
-
-  if (user) {
-    throw new Error("User already exists")
-  }
-
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  await db.insert(users).values({
-    id: crypto.randomUUID(),
-    name: email,
+  const userid = BigInt(Date.now())
+
+  const user = await db.insert(users).values({
+    id: userid,
+    email: email,
+    password: hashedPassword,
     createdAt: new Date(),
     updatedAt: new Date(),
-    email,
-    password: hashedPassword,
-    firstName: "",
-    lastName: "",
-    balance: 0,
   })
 
-  redirect("/")
+  if (!user) {
+    throw new Error("Failed to create user")
+  }
+
+  (await cookies()).set("session", crypto.randomUUID(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: "/",
+  })
+
+  const sessionid = crypto.randomUUID()
+
+  await db.insert(session).values({
+    userId: userid,
+    token: sessionid,
+    maxAge: BigInt(60 * 60 * 24 * 30), // 30 days
+  })
+
+  redirect("/dashboard")
 }
 
 export async function logout() {
@@ -89,7 +111,15 @@ export async function logout() {
   // 2. Clear cookies
   // 3. Invalidate session in database
 
-  console.log("User logged out")
+  (await cookies()).delete("session")
+
+  const sessionid = (await cookies()).get("session")?.value;
+
+  if (!sessionid) {
+    throw new Error("No session found")
+  }
+
+  await db.delete(session).where(eq(session.token, sessionid));
 
   // Redirect to home page
   redirect("/")

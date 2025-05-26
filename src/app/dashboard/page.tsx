@@ -3,12 +3,19 @@ import { CreditCard, ArrowUpRight, ArrowDownLeft, Plus, Send, Receipt, PiggyBank
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { DashboardHeader } from "~/components/dashboard-header"
+import { cookies } from "next/headers"
 
 // Mock function to check if user is authenticated
 // In a real app, this would check session/JWT token
-function isAuthenticated() {
+async function isAuthenticated() {
   // For demo purposes, always return true
   // In production, implement proper session checking
+  const session = (await cookies()).get("session")
+
+  if (!session) {
+    return false
+  }
+
   return true
 }
 
