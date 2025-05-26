@@ -1,24 +1,39 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { eq } from "drizzle-orm"
+import { db } from "~/server/db"
+import { users } from "~/server/db/schema"
+import { cookies } from "next/headers"
+import bcrypt from "bcryptjs"
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const remember = formData.get("remember") as string
 
-  // TODO: Implement actual authentication logic
-  // For now, just simulate a successful login
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  })
+
   console.log("Login attempt:", { email, password, remember })
 
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  if (!user) {
+    throw new Error("User not found")
+  }
 
-  // In a real app, you would:
-  // 1. Validate credentials against your database
-  // 2. Create a session or JWT token
-  // 3. Set secure cookies
-  // 4. Handle errors appropriately
+  if (user.password !== password) {
+    throw new Error("Invalid password")
+  }
+
+  const session = crypto.randomUUID()  // TODO: Store session in database
+
+  ;(await cookies()).set("session", session, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: "/",
+  })
 
   // Redirect to dashboard after successful login
   redirect("/dashboard")
@@ -42,20 +57,29 @@ export async function signup(formData: FormData) {
     throw new Error("You must agree to the terms and conditions")
   }
 
-  // Simulate API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  })
 
-  // In a real app, you would:
-  // 1. Validate email format and password strength
-  // 2. Check if user already exists
-  // 3. Hash the password
-  // 4. Save user to database
-  // 5. Send verification email
-  // 6. Create a session or JWT token
-  // 7. Handle errors appropriately
+  if (user) {
+    throw new Error("User already exists")
+  }
 
-  // For demo purposes, redirect to login page
-  redirect("/login")
+  const hashedPassword = await bcrypt.hash(password, 10)
+
+  await db.insert(users).values({
+    id: crypto.randomUUID(),
+    name: email,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    email,
+    password: hashedPassword,
+    firstName: "",
+    lastName: "",
+    balance: 0,
+  })
+
+  redirect("/")
 }
 
 export async function logout() {
