@@ -12,17 +12,25 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "~/components/ui/avatar"
-import { logout } from "~/app/actions/auth"
+import { logout, signup } from "~/app/actions/auth"
 
 import type { users } from "~/server/db/schema"
+import { useActionState } from "react"
 
 type User = typeof users.$inferSelect
+
+const initialState = {
+  error: null as string | null,
+}
 
 interface DashboardHeaderProps {
   user: User
 }
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
+
+  const [state, formAction] = useActionState(logout, initialState)
+
   const initials = user.email
     .split(" ")
     .map((n) => n[0])
@@ -89,7 +97,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <form action={logout}>
+                <form action={formAction}>
                   <button type="submit" className="flex w-full items-center">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>

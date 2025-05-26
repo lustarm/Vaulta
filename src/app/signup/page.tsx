@@ -1,11 +1,20 @@
+"use client"
+
 import Link from "next/link"
 import { Shield } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { signup } from "~/app/actions/auth"
+import { useActionState } from "react"
+
+const initialState = {
+  error: null as string | null,
+}
 
 export default function SignupPage() {
+  const [state, formAction] = useActionState(signup, initialState)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -21,7 +30,10 @@ export default function SignupPage() {
 
         {/* Signup Form */}
         <div className="bg-white rounded-xl shadow-lg p-8">
-          <form action={signup} className="space-y-6">
+          <form action={formAction} className="space-y-6">
+            {state?.error && (
+              <p className="text-red-500">{state.error}</p>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input id="email" name="email" type="email" placeholder="Enter your email" required className="w-full" />

@@ -11,17 +11,17 @@ import { eq } from "drizzle-orm"
 import { db } from "~/server/db"
 import { sessions, users } from "~/server/db/schema"
 
-export async function login(formData: FormData) {
+export async function login(prevState: { error: string | null }, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const remember = formData.get("remember") as string
 
   if (!email || !password) {
-    throw new Error("Email and password are required")
+    return { error: "Email and password are required" }
   }
 
   if(!remember) {
-    throw new Error("Remember me is required")
+    return { error: "Remember me is required" }
   }
 
   // TODO: Implement actual login logic
@@ -31,11 +31,11 @@ export async function login(formData: FormData) {
   })
 
   if (!user) {
-    throw new Error("User not found")
+    return { error: "User not found" }
   }
 
   if (user.password !== password) {
-    throw new Error("Invalid password")
+    return { error: "Invalid password" }
   }
 
   const session = crypto.randomUUID()
@@ -53,30 +53,26 @@ export async function login(formData: FormData) {
   redirect("/dashboard")
 }
 
-export async function signup(formData: FormData) {
+export async function signup(prevState: { error: string | null }, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
   const terms = formData.get("terms") as string
 
-  // TODO: Implement actual signup logic
-  console.log("Signup attempt:", { email, password, confirmPassword, terms })
-
   // Basic validation
   if (password !== confirmPassword) {
-    throw new Error("Passwords do not match")
+    return { error: "Passwords do not match" }
   }
 
   if (!terms) {
-    throw new Error("You must agree to the terms and conditions")
+    return { error: "You must agree to the terms and conditions" }
   }
 
   const existingUser = await db.select().from(users).where(eq(users.email, email))
 
-  if (existingUser) {
-    throw new Error("User already exists")
+  if (existingUser.length > 0) {
+    return { error: "User already exists" }
   }
-
 
   const userid = BigInt(Date.now())
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -90,7 +86,7 @@ export async function signup(formData: FormData) {
   })
 
   if (!user) {
-    throw new Error("Failed to create user")
+    return { error: "Failed to create user" }
   }
 
   const sessionid = crypto.randomUUID();
@@ -116,7 +112,7 @@ export async function logout() {
   const sessionid = (await cookies()).get("session")?.value;
 
   if (!sessionid) {
-    throw new Error("No session found")
+    return { error: "No session found" }
   }
 
   await db.delete(sessions).where(eq(sessions.token, sessionid));
@@ -128,8 +124,14 @@ export async function checkAuthenticated() {
   const sessionid = (await cookies()).get("session")?.value;
 
   if (!sessionid) {
-    return false 
+    return { error: "No session found" }
   }
 
-  return true
+  const session = await db.select().from(sessions).where(eq(sessions.token, sessionid))
+
+  if (session.length === 0) {
+    return { error: "No session found" }
+  }
+
+  return { error: null }
 }
