@@ -168,22 +168,20 @@ export default function DashboardPage() {
                   <div key={account.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div
-                        className={`p-2 rounded-full ${
-                          account.type === "checking"
+                        className={`p-2 rounded-full ${account.type === "checking"
                             ? "bg-blue-100"
                             : account.type === "savings"
                               ? "bg-green-100"
                               : "bg-red-100"
-                        }`}
+                          }`}
                       >
                         <CreditCard
-                          className={`h-5 w-5 ${
-                            account.type === "checking"
+                          className={`h-5 w-5 ${account.type === "checking"
                               ? "text-blue-600"
                               : account.type === "savings"
                                 ? "text-green-600"
                                 : "text-red-600"
-                          }`}
+                            }`}
                         />
                       </div>
                       <div>

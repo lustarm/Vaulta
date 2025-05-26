@@ -44,3 +44,8 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# go backend
+/backend/go.sum
+/backend/go.mod
+/backend/tmp
