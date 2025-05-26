@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Shield, CreditCard, PiggyBank, BarChart3, ArrowRight } from "lucide-react"
 
 import { Button } from "~/components/ui/button"
@@ -64,10 +65,12 @@ export default function Home() {
               </div>
             </div>
             <div className="hidden md:block">
-              <img
+              <Image
                 src="assets/placeholder.svg?height=400&width=500"
                 alt="Banking app interface"
                 className="rounded-lg shadow-xl"
+                width={500}
+                height={400}
               />
             </div>
           </div>
@@ -152,10 +155,12 @@ export default function Home() {
         <section className="py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
-              <img
+              <Image
                 src="assets/placeholder.svg?height=500&width=400"
                 alt="Mobile banking app"
                 className="mx-auto rounded-lg shadow-xl"
+                width={500}
+                height={400}
               />
             </div>
             <div className="space-y-6 order-1 md:order-2">
