@@ -24,7 +24,7 @@ const conn =
   });
 if (env.NODE_ENV !== "production") globalForDb.pool = conn;
 
-conn.addListener("connection", (conn) => {
+conn.addListener("connection", () => {
   console.log("Connected to SingleStore DB");
 });
 

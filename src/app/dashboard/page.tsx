@@ -20,9 +20,11 @@ async function isAuthenticated() {
 }
 
 export default function DashboardPage() {
-  if (!isAuthenticated()) {
-    redirect("/login")
-  }
+  isAuthenticated().then((isAuthenticated) => {
+    if (!isAuthenticated) {
+      redirect("/login")
+    }
+  })
 
   // Mock user data
   const user = {

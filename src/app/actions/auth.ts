@@ -1,11 +1,12 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { eq } from "drizzle-orm"
 import { cookies } from "next/headers"
 
 import bcrypt from "bcryptjs"
 import crypto from "crypto"
+
+import { eq } from "drizzle-orm"
 
 import { db } from "~/server/db"
 import { session, users } from "~/server/db/schema"
@@ -70,9 +71,15 @@ export async function signup(formData: FormData) {
     throw new Error("You must agree to the terms and conditions")
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10)
+  const existingUser = await db.select().from(users).where(eq(users.email, email))
+
+  if (existingUser) {
+    throw new Error("User already exists")
+  }
+
 
   const userid = BigInt(Date.now())
+  const hashedPassword = await bcrypt.hash(password, 10)
 
   const user = await db.insert(users).values({
     id: userid,
@@ -86,14 +93,13 @@ export async function signup(formData: FormData) {
     throw new Error("Failed to create user")
   }
 
-  (await cookies()).set("session", crypto.randomUUID(), {
+  const sessionid = crypto.randomUUID();
+
+  (await cookies()).set("session", sessionid, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 30, // 30 days
-    path: "/",
   })
-
-  const sessionid = crypto.randomUUID()
 
   await db.insert(session).values({
     userId: userid,
@@ -105,12 +111,6 @@ export async function signup(formData: FormData) {
 }
 
 export async function logout() {
-  // TODO: Implement actual logout logic
-  // In a real app, you would:
-  // 1. Clear session/JWT token
-  // 2. Clear cookies
-  // 3. Invalidate session in database
-
   (await cookies()).delete("session")
 
   const sessionid = (await cookies()).get("session")?.value;
@@ -121,6 +121,5 @@ export async function logout() {
 
   await db.delete(session).where(eq(session.token, sessionid));
 
-  // Redirect to home page
   redirect("/")
 }
