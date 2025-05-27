@@ -66,11 +66,12 @@ export default function Home() {
             </div>
             <div className="hidden md:block">
               <Image
-                src="assets/placeholder.svg?height=400&width=500"
+                src="/assets/couple_phone.jpg"
                 alt="Banking app interface"
                 className="rounded-lg shadow-xl"
                 width={500}
                 height={400}
+                priority
               />
             </div>
           </div>
@@ -156,11 +157,12 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-2 items-center">
             <div className="order-2 md:order-1">
               <Image
-                src="assets/placeholder.svg?height=500&width=400"
+                src="/assets/phone.jpg"
                 alt="Mobile banking app"
                 className="mx-auto rounded-lg shadow-xl"
                 width={500}
                 height={400}
+                priority
               />
             </div>
             <div className="space-y-6 order-1 md:order-2">

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "~/components/ui/avatar"
-import { logout, signup } from "~/app/actions/auth"
+import { logout } from "~/app/actions/auth"
 
 import type { users } from "~/server/db/schema"
 import { useActionState } from "react"
@@ -29,7 +29,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
 
-  const [state, formAction] = useActionState(logout, initialState)
+  const [,formAction] = useActionState(logout, initialState)
 
   const initials = user.email
     .split(" ")
