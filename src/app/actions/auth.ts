@@ -115,7 +115,7 @@ export async function signup(prevState: any, formData: FormData) {
   redirect("/dashboard")
 }
 
-export async function logout(formData: FormData) {
+export async function logout(prevState: any, formData: FormData) {
   (await cookies()).delete("session")
 
   const sessionid = (await cookies()).get("session")?.value;
