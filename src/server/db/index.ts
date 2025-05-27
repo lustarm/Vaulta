@@ -25,7 +25,7 @@ const conn =
 if (env.NODE_ENV !== "production") globalForDb.pool = conn;
 
 conn.addListener("connection", () => {
-  console.log("Connected to SingleStore DB");
+  // console.log("Connected to SingleStore DB");
 });
 
 export const db = drizzle(conn, { schema });

@@ -11,7 +11,14 @@ import { eq } from "drizzle-orm"
 import { db } from "~/server/db"
 import { sessions, users } from "~/server/db/schema"
 
-export async function login(prevState: { error: string | null }, formData: FormData) {
+export async function login(prevState: any, formData: FormData) {
+  // check if use is already logged in
+  const isAuthenticated = await checkAuthenticated()
+
+  if (isAuthenticated) {
+    redirect("/dashboard")
+  }
+
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const remember = formData.get("remember") as string
@@ -24,6 +31,10 @@ export async function login(prevState: { error: string | null }, formData: FormD
 
   if (userArray.length === 0) {
     return { error: "User not found" }
+  }
+
+  if (userArray.length > 1) {
+    return { error: "Multiple users found" }
   }
 
   const user = userArray[0]!
@@ -51,7 +62,7 @@ export async function login(prevState: { error: string | null }, formData: FormD
   redirect("/dashboard")
 }
 
-export async function signup(prevState: { error: string | null }, formData: FormData) {
+export async function signup(prevState: any, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
@@ -104,7 +115,7 @@ export async function signup(prevState: { error: string | null }, formData: Form
   redirect("/dashboard")
 }
 
-export async function logout() {
+export async function logout(formData: FormData) {
   (await cookies()).delete("session")
 
   const sessionid = (await cookies()).get("session")?.value;
@@ -113,7 +124,7 @@ export async function logout() {
     return { error: "No session found" }
   }
 
-  await db.delete(sessions).where(eq(sessions.token, sessionid));
+  await db.delete(sessions).where(eq(sessions.token, sessionid!))
 
   redirect("/")
 }
