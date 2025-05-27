@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm"
 import { db } from "~/server/db"
 import { sessions, users } from "~/server/db/schema"
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(_: { error: string | null }, formData: FormData) {
   // check if use is already logged in
   const isAuthenticated = await checkAuthenticated()
 
@@ -62,7 +62,7 @@ export async function login(prevState: any, formData: FormData) {
   redirect("/dashboard")
 }
 
-export async function signup(prevState: any, formData: FormData) {
+export async function signup(_: { error: string | null }, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const confirmPassword = formData.get("confirmPassword") as string
@@ -115,7 +115,7 @@ export async function signup(prevState: any, formData: FormData) {
   redirect("/dashboard")
 }
 
-export async function logout(prevState: any, formData: FormData) {
+export async function logout(currentState: { error: string | null }, formData: FormData) {
   (await cookies()).delete("session")
 
   const sessionid = (await cookies()).get("session")?.value;
@@ -124,7 +124,7 @@ export async function logout(prevState: any, formData: FormData) {
     return { error: "No session found" }
   }
 
-  await db.delete(sessions).where(eq(sessions.token, sessionid!))
+  await db.delete(sessions).where(eq(sessions.token, sessionid))
 
   redirect("/")
 }
