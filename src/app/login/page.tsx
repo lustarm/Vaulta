@@ -7,14 +7,22 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { login } from "~/app/actions/auth"
 import { useActionState } from "react"
+import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 
 const initialState = {
   error: null as string | null,
 }
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // If the user is already logged in, redirect to the dashboard
+  const cookieStore = await cookies()
+  if (cookieStore.get("session")) {
+    redirect("/dashboard")
+  }
 
   const [state, formAction] = useActionState(login, initialState)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

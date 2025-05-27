@@ -7,12 +7,20 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { signup } from "~/app/actions/auth"
 import { useActionState } from "react"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 const initialState = {
   error: null as string | null,
 }
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  // If the user is already logged in, redirect to the dashboard
+  const cookieStore = await cookies()
+  if (cookieStore.get("session")) {
+    redirect("/dashboard")
+  }
+
   const [state, formAction] = useActionState(signup, initialState)
 
   return (
